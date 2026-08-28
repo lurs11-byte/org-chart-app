@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   ReactFlow,
   ReactFlowProvider,
@@ -21,6 +21,8 @@ import EntityModal from "./components/EntityModal";
 import "./App.css";
 
 const STORAGE_KEY = "org-chart-entities";
+const TITLE_STORAGE_KEY = "org-chart-app-title";
+const DEFAULT_TITLE = "Org chart";
 const nodeTypes = { entity: EntityNode };
 
 function loadEntities() {
@@ -33,18 +35,45 @@ function loadEntities() {
   return seedData;
 }
 
-function buildNodes(entities, positions, onEdit, onDelete) {
-  return entities.map((e) => ({
+function loadTitle() {
+  return localStorage.getItem(TITLE_STORAGE_KEY) || DEFAULT_TITLE;
+}
+
+// Areas of responsibility render as tags on their manager's card instead of
+// their own node, unless they have no valid manager to attach to.
+function splitAreas(entities) {
+  const nonAreaIds = new Set(entities.filter((e) => e.type !== "area").map((e) => e.id));
+  const attachedAreas = [];
+  const standaloneEntities = [];
+
+  entities.forEach((e) => {
+    if (e.type === "area" && e.reportsTo && nonAreaIds.has(e.reportsTo)) {
+      attachedAreas.push(e);
+    } else {
+      standaloneEntities.push(e);
+    }
+  });
+
+  const areasByParent = attachedAreas.reduce((acc, a) => {
+    (acc[a.reportsTo] = acc[a.reportsTo] || []).push(a);
+    return acc;
+  }, {});
+
+  return { standaloneEntities, areasByParent };
+}
+
+function buildNodes(standaloneEntities, positions, areasByParent, onEdit, onDelete) {
+  return standaloneEntities.map((e) => ({
     id: e.id,
     type: "entity",
     position: positions[e.id] || { x: 0, y: 0 },
-    data: { entity: e, onEdit, onDelete },
+    data: { entity: e, areas: areasByParent[e.id] || [], onEdit, onDelete },
   }));
 }
 
-function buildEdges(entities) {
-  return entities
-    .filter((e) => e.reportsTo && entities.some((o) => o.id === e.reportsTo))
+function buildEdges(standaloneEntities) {
+  return standaloneEntities
+    .filter((e) => e.reportsTo && standaloneEntities.some((o) => o.id === e.reportsTo))
     .map((e) => ({
       id: `${e.reportsTo}->${e.id}`,
       source: e.reportsTo,
@@ -56,6 +85,7 @@ function buildEdges(entities) {
 
 function Chart() {
   const [entities, setEntities] = useState(loadEntities);
+  const [title, setTitle] = useState(loadTitle);
   const [modalState, setModalState] = useState(null); // { mode, type, initial }
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges] = useEdgesState([]);
@@ -64,6 +94,10 @@ function Chart() {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(entities));
   }, [entities]);
+
+  useEffect(() => {
+    localStorage.setItem(TITLE_STORAGE_KEY, title);
+  }, [title]);
 
   const openEdit = useCallback((entity) => {
     setModalState({ mode: "edit", type: entity.type, initial: entity });
@@ -76,7 +110,11 @@ function Chart() {
   const requestDelete = useCallback(
     (entity) => {
       const label = entity.type === "person" ? entity.name : `"${entity.name}"`;
-      if (!window.confirm(`Delete ${label}? Anyone reporting to them moves up to their manager.`)) return;
+      const message =
+        entity.type === "area"
+          ? `Delete ${label}?`
+          : `Delete ${label}? Anyone reporting to them moves up to their manager.`;
+      if (!window.confirm(message)) return;
       setEntities((prev) =>
         prev
           .filter((e) => e.id !== entity.id)
@@ -88,9 +126,14 @@ function Chart() {
 
   // recompute layout whenever the underlying data changes
   useEffect(() => {
-    const positions = computeLayout(entities);
-    setNodes(buildNodes(entities, positions, openEdit, requestDelete));
-    setEdges(buildEdges(entities));
+    const { standaloneEntities, areasByParent } = splitAreas(entities);
+    const entitiesForLayout = standaloneEntities.map((e) => {
+      const count = (areasByParent[e.id] || []).length;
+      return count ? { ...e, _areaCount: count } : e;
+    });
+    const positions = computeLayout(entitiesForLayout);
+    setNodes(buildNodes(standaloneEntities, positions, areasByParent, openEdit, requestDelete));
+    setEdges(buildEdges(standaloneEntities));
   }, [entities, openEdit, requestDelete, setNodes, setEdges]);
 
   const handleNodesChange = useCallback(
@@ -124,7 +167,7 @@ function Chart() {
 
   return (
     <div className="chart-page">
-      <Toolbar onAdd={openAdd} />
+      <Toolbar title={title} onTitleChange={setTitle} onAdd={openAdd} />
       <ReactFlow
         nodes={nodes}
         edges={edges}

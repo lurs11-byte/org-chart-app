@@ -4,7 +4,7 @@ import { iconFor } from "./icons";
 import "./EntityNode.css";
 
 export default function EntityNode({ data }) {
-  const { entity, onEdit, onDelete } = data;
+  const { entity, areas = [], onEdit, onDelete } = data;
   const isExec = entity.type === "person" && entity.department === "exec";
   const dim = dimensionsFor(entity);
   const dept = entity.department || "exec";
@@ -44,6 +44,21 @@ export default function EntityNode({ data }) {
       <div className="entity-card__name">{entity.name}</div>
       <div className="entity-card__divider" />
       <div className="entity-card__title">{subtitle}</div>
+
+      {areas.length > 0 && (
+        <div className="entity-card__tags">
+          {areas.map((area) => (
+            <span key={area.id} className={`area-tag dept-${area.department || dept}`}>
+              <button className="area-tag__label" onClick={() => onEdit(area)} title="Edit area of responsibility">
+                {area.name}
+              </button>
+              <button className="area-tag__x" onClick={() => onDelete(area)} title="Delete">
+                ✕
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
 
       <Handle type="source" position={Position.Bottom} />
     </div>

@@ -9,8 +9,12 @@ const DIMENSIONS = {
 const EXEC_DIMENSIONS = { width: 240, height: 108 };
 
 export function dimensionsFor(entity) {
-  if (entity.type === "person" && entity.department === "exec") return EXEC_DIMENSIONS;
-  return DIMENSIONS[entity.type] || DIMENSIONS.person;
+  const base =
+    entity.type === "person" && entity.department === "exec"
+      ? EXEC_DIMENSIONS
+      : DIMENSIONS[entity.type] || DIMENSIONS.person;
+  const tagAllowance = entity._areaCount > 0 ? 30 : 0;
+  return { width: base.width, height: base.height + tagAllowance };
 }
 
 export function computeLayout(entities) {

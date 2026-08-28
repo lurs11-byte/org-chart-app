@@ -152,9 +152,59 @@
   border-color: var(--text-muted);
 }
 
+.entity-card__tags {
+  display: flex;
+  gap: 5px;
+  margin-top: 8px;
+  max-width: 100%;
+  overflow-x: auto;
+  padding-bottom: 1px;
+}
+
+.area-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  border: 1px dashed var(--dept-border, var(--border));
+  border-radius: 20px;
+  padding: 2px 4px 2px 8px;
+  flex-shrink: 0;
+  background: transparent;
+}
+
+.area-tag__label {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--dept-text, var(--text-muted));
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.area-tag__x {
+  background: none;
+  border: none;
+  padding: 0 2px;
+  font-size: 8px;
+  color: var(--text-muted);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+.entity-card:hover .area-tag__x {
+  opacity: 0.7;
+}
+
+.area-tag__x:hover {
+  opacity: 1 !important;
+}
+
 /* department accents */
-.dept-exec { border-color: var(--exec-border); --dept-solid: var(--exec-border); }
-.dept-product { border-color: var(--product-border); --dept-solid: var(--product-solid); --dept-text: var(--product-text); }
-.dept-marketing { border-color: var(--marketing-border); --dept-solid: var(--marketing-solid); --dept-text: var(--marketing-text); }
-.dept-technology { border-color: var(--technology-border); --dept-solid: var(--technology-solid); --dept-text: var(--technology-text); }
-.dept-operations { border-color: var(--operations-border); --dept-solid: var(--operations-solid); --dept-text: var(--operations-text); }
+.dept-exec { border-color: var(--exec-border); --dept-solid: var(--exec-border); --dept-border: var(--exec-border); }
+.dept-product { border-color: var(--product-border); --dept-solid: var(--product-solid); --dept-text: var(--product-text); --dept-border: var(--product-border); }
+.dept-marketing { border-color: var(--marketing-border); --dept-solid: var(--marketing-solid); --dept-text: var(--marketing-text); --dept-border: var(--marketing-border); }
+.dept-technology { border-color: var(--technology-border); --dept-solid: var(--technology-solid); --dept-text: var(--technology-text); --dept-border: var(--technology-border); }
+.dept-operations { border-color: var(--operations-border); --dept-solid: var(--operations-solid); --dept-text: var(--operations-text); --dept-border: var(--operations-border); }
