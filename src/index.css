@@ -1,0 +1,49 @@
+:root {
+  --bg: #fafaf8;
+  --panel-bg: #ffffff;
+  --border: #e8e6e1;
+  --text: #2c2b28;
+  --text-muted: #8a887f;
+  --line: #d8d5cd;
+
+  --exec-bg: #fffdf6;
+  --exec-border: #e0d3a0;
+  --exec-icon: #a8893f;
+
+  --product-bg: #f6f0fc;
+  --product-border: #d6bdf0;
+  --product-text: #8a5cc4;
+  --product-solid: #a97fd6;
+
+  --marketing-bg: #eef4fd;
+  --marketing-border: #b9d3f5;
+  --marketing-text: #4a7fc7;
+  --marketing-solid: #6fa0dd;
+
+  --technology-bg: #eaf7f2;
+  --technology-border: #aee0cb;
+  --technology-text: #349a74;
+  --technology-solid: #4db690;
+
+  --operations-bg: #fdf1e7;
+  --operations-border: #f3cda0;
+  --operations-text: #c47f2e;
+  --operations-solid: #e0983f;
+
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+  color: var(--text);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+}
+
+button {
+  font-family: inherit;
+}

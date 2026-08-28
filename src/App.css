@@ -1,0 +1,36 @@
+.chart-page {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  background: var(--bg);
+}
+
+.react-flow__node {
+  transition: transform 0.28s ease;
+}
+
+.react-flow__edge-path {
+  stroke: var(--line);
+}
+
+.react-flow__controls {
+  box-shadow: 0 1px 4px rgba(20, 20, 15, 0.08);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.react-flow__controls-button {
+  border: none;
+  border-bottom: 1px solid var(--border);
+}
+
+@media (max-width: 680px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .toolbar__actions {
+    flex-wrap: wrap;
+  }
+}
